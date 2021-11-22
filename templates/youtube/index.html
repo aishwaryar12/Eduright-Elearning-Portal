@@ -1,0 +1,24 @@
+{% extends "youtube/base.html" %}
+{% load static %}
+{% block body_youtube %}
+<!-- List Section is Here -->
+<div class="container-fluid">
+    <div id="list_of_tutorial">
+        <div class="card-deck">
+            {% for v in vlist %}
+            <div class="col-md-3 text-center mt-2">
+                <img class="rounded-circle" src="{% static v.image.url %}" width="140" height="140">
+                <h2>{{v.title}}</h2>
+                <p>
+                    {{v.description}}
+                </p>
+                <p>
+                    <a href="{% url 'youtube_videos' v.title %}" class="btn btn-info">Start Watching »</a>
+                </p>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+{% endblock body_youtube %}

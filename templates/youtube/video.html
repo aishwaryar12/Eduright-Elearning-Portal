@@ -1,0 +1,214 @@
+{% extends "youtube/base.html" %}
+{% load static %}
+
+{% block head_youtube %}
+<link href="{% static 'main/css/logforms.css' %}" rel="stylesheet">
+
+<link rel="stylesheet" href="{% static 'blog/css/blog_style.css' %}">
+<style type="text/css">
+  .anc:hover {
+    background-color: #6c757d;
+
+  }
+
+  .aactive {
+    background-color: #6c757d;
+  }
+
+  .active {
+    border-bottom: solid #222428;
+  }
+
+  .listofvideos {
+    height: 477px;
+  }
+
+  @media(max-width: 777px) {
+    .listofvideos {
+      height: 300px
+    }
+  }
+</style>
+{% endblock head_youtube %}
+{% block body_youtube %}
+<div class="container-fluid">
+  <div class="row mt-2">
+    <div class="col-md-3 col-2 fixed-top mt-2" id="rowdiv1">
+
+      <div class="card bg-dark">
+
+        <h5 class="card-title pt-2 pl-3 pr-3 text-light text-center">
+          {% if previd %}
+          <a class="float-left" href="{% url 'youtube_video' vid.video_list previd.id previd.title %}"><i
+              class="fa fa-backward" aria-hidden="true"></i></a>
+          {% endif %}
+          All Videos
+          {% if nextvid %}
+          <a class="float-right" href="{% url 'youtube_video' vid.video_list nextvid.id nextvid.title %}"><i
+              class="fa fa-forward" aria-hidden="true"></i></a>
+          {% endif %}
+
+        </h5>
+        <hr class="m-0 bg-light">
+        <ul class=" text-light list-unstyled listofvideos" style="overflow-y: scroll;" id="scrolling_div">
+          {% for v in allvid %}
+          {% if v == vid %}
+          <li id="element_within_div" class="content-holder-item anc"><a
+              href="{% url 'youtube_video' vid.video_list v.id v.title %}"
+              class="btn text-light w-100 text-left aactive" style="border-radius: 0;">
+              <i class="fa fa-youtube-play" aria-hidden="true"></i>
+              {{forloop.counter}}. {{v.title}}
+
+            </a></li>
+          {% else %}
+          <li class="content-holder-item"><a href="{% url 'youtube_video' vid.video_list v.id v.title %}"
+              class="btn text-light w-100 text-left anc" style="border-radius: 0;">
+              <i class="fa fa-youtube-play" aria-hidden="true"></i>
+              {{forloop.counter}}. {{v.title}}
+
+            </a></li>
+          {% endif %}
+          <!-- <hr class="m-0 bg-light"> -->
+          {% endfor %}
+        </ul>
+
+      </div>
+      {% if vid.video_list.source_files %}
+      <a class="btn logbtn w-100 mt-2 mb-2" href="{{vid.video_list.source_files.url}}" download="{{vid.video_list}}"><i
+          class="fa fa-download"></i> Download Source Code</a>
+      {% endif %}
+
+    </div>
+
+    <div class="col-md-9 offset-md-3" id="rowdiv2">
+      <div class="embed-responsive embed-responsive-16by9 px-3">
+        <iframe class="embed-responsive-item" src="//www.youtube.com/embed/{{vid.video}}" allowfullscreen></iframe>
+      </div>
+      <div class="mt-2">
+        <h5 style="  display: inline;">{{vid.title}}</h5>
+
+        <a href="#allcomm" style="float: right;" id="commview"
+          onclick="this.style.display='none';$('#allcomm').show();$('#descview').show();$('#deschere').hide()"><b
+            id>Comments <i class="fa fa-comments-o" aria-hidden="true"></i></b></a>
+
+        <a href="#deschere" style="float: right; display: none;" id="descview"
+          onclick="this.style.display='none';$('#deschere').show();$('#commview').show();$('#allcomm').hide()"><b
+            id>Description <i class="fa fa-file-text-o" aria-hidden="true"></i></b></a>
+
+        <hr class="bg-dark mb-1">
+        <div id="deschere">
+          {{vid.desc|safe}}
+        </div>
+        <div id="allcomm" style="display: none;">
+          <div class="" id="">
+            <div class="section-title">
+              <h4 class="">{{comments|length }} Comments</h4>
+            </div>
+            {% if user.is_authenticated %}
+
+            <ul class="comment-list" style="max-height: 500px; overflow-y: scroll;" id="commlist">
+              {% for cm in comments %}
+              <li class="comment" {% if forloop.last %} id="lastcomment" {% endif %}>
+                <div class="vcard bio">
+                  <img src="{% static 'main/img/fevicon.png' %}" alt="Image placeholder">
+                </div>
+                <div class="comment-body">
+                  <h3 {% if request.user.is_superuser %} style="color: #ff4777;" {% endif %}>{{cm.0.user.username}}</h3>
+                  <div class="meta">{{cm.0.time}}</div>
+                  <p>{{cm.0.comm}}</p>
+                  <p id="{{cm.0.id}}"><button onclick="ReplyForm('{{cm.0.id}}')" class="logbtn">Reply</button></p>
+                </div>
+
+                <ul class="children">
+                  {% for subc in cm.1 %}
+                  <li class="comment">
+                    <div class="vcard bio">
+                      <img src="{% static 'main/img/fevicon.png' %}" alt="Image placeholder">
+                    </div>
+                    <div class="comment-body">
+                      <h3 {% if request.user.is_superuser %} style="color: #ff4777;" {% endif %}>{{subc.user.username}}
+                      </h3>
+                      <div class="meta">{{subc.time}}</div>
+                      <p>{{subc.comm}}</p>
+                    </div>
+
+
+                  </li>
+                  {% endfor %}
+                </ul>
+              </li>
+              {% endfor %}
+
+            </ul>
+            <!-- END comment-list -->
+            <script type="text/javascript">
+              function ReplyForm(id) {
+                let elm = `<form method="POST" class="">
+                                    {% csrf_token %}
+                        <div class="form-group float-left" style="width: 90%;">
+                        <input type='text' value='${id}' name = 'comm_id' style="display:none;" readonly/>
+                        <div class="group">
+                          <textarea name="comm" id="message" rows="2" class="" required></textarea>
+                          <span class="highlight"></span><span class="bar"></span>
+                            <label>Write Your Replay</label></div>
+                        </div>
+                        <div class="form-group float-right" style="width: 10%;">
+                          <button type="submit" row class="btn text-light"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+                        </div>
+      
+                      </form>`;
+                document.getElementById(id).innerHTML = elm;
+              }
+            </script>
+            <div class="comment-form-wrap">
+
+              <form method="POST" class="">
+                {% csrf_token %}
+                <div class="form-group float-left group" style="width: 90%;">
+
+                  <textarea name="comm" id="message" rows="2" class="" required></textarea>
+                  <span class="highlight"></span><span class="bar"></span>
+                  <label>Write Your Comment</label>
+                </div>
+                <div class="form-group float-right" style="width: 10%;">
+                  <label></label>
+                  <button type="submit" row class="btn text-light"><i class="fa fa-paper-plane"
+                      aria-hidden="true"></i></button>
+                </div>
+
+              </form>
+            </div>
+            {% else %}
+            <b><a href="{% url 'login' %}" class="">Log In </a> For Comment on Video </b>
+
+            <a href="{% url 'register' %}" class="float-right"> Sign Up</a> {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+</div>
+<script type="text/javascript">
+  let myElement = document.getElementById('element_within_div');
+  let topPos = myElement.offsetTop;
+  document.getElementById('scrolling_div').scrollTop = topPos;
+
+  if (document.body.offsetWidth < 777) {
+    document.getElementById('rowdiv1').className = "col-md-3";
+    document.getElementById('rowdiv2').className = "col-md-9";
+  }
+
+  if (window.location.href.split('#')[1] == 'allcomm') {
+    $('#commview').hide();
+    $('#allcomm').show();
+    $('#descview').show();
+    $('#deschere').hide();
+    let myElement = document.getElementById('lastcomment');
+    let topPos = myElement.offsetTop;
+    document.getElementById('commlist').scrollTop = topPos;
+    // console.log(true)
+  }
+</script>
+{% endblock body_youtube %}

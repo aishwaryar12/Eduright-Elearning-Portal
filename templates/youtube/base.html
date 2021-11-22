@@ -1,0 +1,41 @@
+<html>
+<head>
+<title>EduRight</title>
+    {% load static %}
+<link rel="stylesheet" href="{% static 'youtube/style.css' %}">
+
+{% block head_youtube %}
+
+{% endblock head_youtube %}
+
+
+</head>
+<body>
+
+{% include "quiz/navbar.html" %}
+<br/>
+<br/>
+
+{% block body_youtube %}
+
+{% endblock body_youtube %}
+
+<!--  <section class="second_nav">
+        <div class="onoffswitch">
+            <input onclick="onoffswitchf()" type="checkbox" name="onoffswitch" class="onoffswitch-checkbox"
+                id="myonoffswitch" checked>
+            <label class="onoffswitch-label" for="myonoffswitch">
+                <span class="onoffswitch-inner"></span>
+                <span class="onoffswitch-switch"></span>
+            </label>
+        </div>
+    </section> -->
+
+
+<script type="text/javascript" src="{% static 'youtube/js/youtube.js' %}"></script>
+<script src="https://apis.google.com/js/platform.js"></script>
+<br/>
+<br/>
+{% include "quiz/footer.html" %}
+</body>
+</html>

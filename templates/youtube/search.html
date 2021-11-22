@@ -1,0 +1,50 @@
+{% extends "youtube/base.html" %}
+{% load static %}
+{% block body_youtube %}
+<!-- List Section is Here -->
+
+<div class="container">
+    <h3 class="text-center" style="font-family: hacked; letter-spacing: 1px; color: #ff4777"> {{title}}</h3>
+    <hr class="m-auto p-0 w-25" style=" background-color: #ff4777">
+    <div class="row">
+        <div class="col-md-9">
+            <h3 style="font-family: economicaregular; letter-spacing: 1px; border-bottom: solid;">Videos</h3>
+            <div class="row">
+                {% for vd in vid %}
+                <div class="col-md-6 mb-3">
+                    <div class="card bg-dark text-light">
+                        <h5 class="card-header">{{vd.video_list.title}}</h5>
+                        <div class="card-body">
+                            <h5 class="card-title">{{vd.title}}</h5>
+                            <p class="card-text">{{vd.desc|truncatechars:250|safe}}</p>
+                            <a href="{% url 'youtube_video' vd.video_list vd.id vd.title %}" class="btn logbtn">Start
+                                Watching »</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-3">
+            <h3 style="font-family: economicaregular; letter-spacing: 1px; border-bottom: solid;">Video List</h3>
+            <div id="list_of_tutorial">
+                {% for v in vidlist %}
+                <div class=" text-center mt-2">
+                    <img class="rounded-circle" src="{% static v.image.url %}" width="100" height="100">
+                    <h4>{{v.title}}</h4>
+                    <p>
+                        {{v.description}}
+                    </p>
+                    <p>
+                        <a href="{% url 'youtube_videos' v.title %}" class="btn btn-sm logbtn">Start Watching »</a>
+                    </p>
+                </div>
+                <hr class="m-0 p-0 bg-dark">
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock body_youtube %}
